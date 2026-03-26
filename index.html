@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ficcion OS</title>
 
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
 
   <style>
@@ -30,7 +29,7 @@
 
     button {
       display: block;
-      width: 80%;
+      width: 90%;
       margin: 10px auto;
       padding: 15px;
       font-size: 16px;
@@ -41,39 +40,88 @@
       cursor: pointer;
     }
 
-    button:hover {
-      background: #1d4ed8;
+    textarea {
+      width: 90%;
+      height: 100px;
+      margin: 10px auto;
+      border-radius: 10px;
+      padding: 10px;
+      border: none;
+      font-size: 14px;
+    }
+
+    .saved {
+      background: #020617;
+      margin: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      text-align: left;
     }
   </style>
 </head>
 
 <body>
 
-  <header>
-    Ficcion OS 🚀
-  </header>
+<header>Ficcion OS 🚀</header>
 
-  <div class="container">
-    <h2>Agentes IA</h2>
+<div class="container">
 
-    <button onclick="openAI('chatgpt')">Abrir ChatGPT</button>
-    <button onclick="openAI('claude')">Abrir Claude</button>
-    <button onclick="openAI('deepseek')">Abrir DeepSeek</button>
-  </div>
+  <h2>Agentes IA</h2>
+  <button onclick="openAI('chatgpt')">Abrir ChatGPT</button>
+  <button onclick="openAI('claude')">Abrir Claude</button>
+  <button onclick="openAI('deepseek')">Abrir DeepSeek</button>
 
-  <script>
-    function openAI(agent) {
-      let prompt = encodeURIComponent("Actúa como un sistema operativo de agentes IA. Ayúdame a construir mi ecosistema.");
+  <h2>Guardar idea / prompt</h2>
+  <textarea id="idea" placeholder="Escribe aquí tu idea..."></textarea>
+  <button onclick="saveIdea()">Guardar</button>
 
-      let urls = {
-        chatgpt: `https://chat.openai.com/?q=${prompt}`,
-        claude: `https://claude.ai/new?q=${prompt}`,
-        deepseek: `https://chat.deepseek.com/?q=${prompt}`
-      };
+  <h2>Memoria</h2>
+  <div id="memory"></div>
 
-      window.open(urls[agent], '_blank');
-    }
-  </script>
+</div>
+
+<script>
+
+function openAI(agent) {
+  let prompt = encodeURIComponent(document.getElementById("idea").value || "Ayúdame a construir mi ecosistema de agentes IA");
+
+  let urls = {
+    chatgpt: `https://chat.openai.com/?q=${prompt}`,
+    claude: `https://claude.ai/new?q=${prompt}`,
+    deepseek: `https://chat.deepseek.com/?q=${prompt}`
+  };
+
+  window.open(urls[agent], '_blank');
+}
+
+function saveIdea() {
+  let idea = document.getElementById("idea").value;
+  if (!idea) return;
+
+  let memory = JSON.parse(localStorage.getItem("ideas")) || [];
+  memory.push(idea);
+  localStorage.setItem("ideas", JSON.stringify(memory));
+
+  document.getElementById("idea").value = "";
+  loadMemory();
+}
+
+function loadMemory() {
+  let memory = JSON.parse(localStorage.getItem("ideas")) || [];
+  let container = document.getElementById("memory");
+  container.innerHTML = "";
+
+  memory.reverse().forEach(item => {
+    let div = document.createElement("div");
+    div.className = "saved";
+    div.innerText = item;
+    container.appendChild(div);
+  });
+}
+
+loadMemory();
+
+</script>
 
 </body>
 </html>
