@@ -28,13 +28,11 @@
     }
 
     button {
-      display: block;
-      width: 90%;
-      margin: 10px auto;
-      padding: 15px;
-      font-size: 16px;
+      margin: 5px;
+      padding: 10px;
+      font-size: 14px;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       background: #2563eb;
       color: white;
       cursor: pointer;
@@ -57,6 +55,18 @@
       border-radius: 10px;
       text-align: left;
     }
+
+    .actions {
+      margin-top: 5px;
+    }
+
+    .delete {
+      background: #dc2626;
+    }
+
+    .edit {
+      background: #f59e0b;
+    }
   </style>
 </head>
 
@@ -67,12 +77,13 @@
 <div class="container">
 
   <h2>Agentes IA</h2>
-  <button onclick="openAI('chatgpt')">Abrir ChatGPT</button>
-  <button onclick="openAI('claude')">Abrir Claude</button>
-  <button onclick="openAI('deepseek')">Abrir DeepSeek</button>
+  <button onclick="openAI('chatgpt')">ChatGPT</button>
+  <button onclick="openAI('claude')">Claude</button>
+  <button onclick="openAI('deepseek')">DeepSeek</button>
 
   <h2>Guardar idea / prompt</h2>
   <textarea id="idea" placeholder="Escribe aquí tu idea..."></textarea>
+  <br>
   <button onclick="saveIdea()">Guardar</button>
 
   <h2>Memoria</h2>
@@ -94,27 +105,76 @@ function openAI(agent) {
   window.open(urls[agent], '_blank');
 }
 
+function getMemory() {
+  return JSON.parse(localStorage.getItem("ideas")) || [];
+}
+
+function setMemory(memory) {
+  localStorage.setItem("ideas", JSON.stringify(memory));
+}
+
 function saveIdea() {
   let idea = document.getElementById("idea").value;
   if (!idea) return;
 
-  let memory = JSON.parse(localStorage.getItem("ideas")) || [];
+  let memory = getMemory();
   memory.push(idea);
-  localStorage.setItem("ideas", JSON.stringify(memory));
+  setMemory(memory);
 
   document.getElementById("idea").value = "";
   loadMemory();
 }
 
+function deleteIdea(index) {
+  let memory = getMemory();
+  memory.splice(index, 1);
+  setMemory(memory);
+  loadMemory();
+}
+
+function editIdea(index) {
+  let memory = getMemory();
+  let nueva = prompt("Editar idea:", memory[index]);
+  if (nueva !== null) {
+    memory[index] = nueva;
+    setMemory(memory);
+    loadMemory();
+  }
+}
+
 function loadMemory() {
-  let memory = JSON.parse(localStorage.getItem("ideas")) || [];
+  let memory = getMemory();
   let container = document.getElementById("memory");
   container.innerHTML = "";
 
-  memory.reverse().forEach(item => {
+  memory.slice().reverse().forEach((item, i) => {
+    let index = memory.length - 1 - i;
+
     let div = document.createElement("div");
     div.className = "saved";
-    div.innerText = item;
+
+    let text = document.createElement("div");
+    text.innerText = item;
+
+    let actions = document.createElement("div");
+    actions.className = "actions";
+
+    let editBtn = document.createElement("button");
+    editBtn.innerText = "Editar";
+    editBtn.className = "edit";
+    editBtn.onclick = () => editIdea(index);
+
+    let delBtn = document.createElement("button");
+    delBtn.innerText = "Borrar";
+    delBtn.className = "delete";
+    delBtn.onclick = () => deleteIdea(index);
+
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+
+    div.appendChild(text);
+    div.appendChild(actions);
+
     container.appendChild(div);
   });
 }
