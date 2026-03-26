@@ -1,626 +1,79 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>FICCION | Central IA v0.4</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ficcion OS</title>
 
-        body {
-            background: linear-gradient(135deg, #0a0f1e 0%, #0f172a 100%);
-            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
-            color: #e2e8f0;
-            min-height: 100vh;
-            padding-bottom: 70px;
-        }
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
 
-        .app-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 1rem 1rem 2rem;
-        }
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+    }
 
-        .header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
+    header {
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      background: #020617;
+    }
 
-        .header h1 {
-            font-size: 1.8rem;
-            background: linear-gradient(135deg, #FFD700, #1E90FF);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -0.5px;
-        }
+    .container {
+      padding: 20px;
+    }
 
-        .header-buttons {
-            display: flex;
-            gap: 0.8rem;
-            justify-content: center;
-            margin-top: 0.8rem;
-        }
+    button {
+      display: block;
+      width: 80%;
+      margin: 10px auto;
+      padding: 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
 
-        .module {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .module.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px);}
-            to { opacity: 1; transform: translateY(0);}
-        }
-
-        .card {
-            background: rgba(15, 25, 45, 0.7);
-            backdrop-filter: blur(8px);
-            border-radius: 24px;
-            padding: 1.2rem;
-            margin-bottom: 1.2rem;
-            border: 1px solid rgba(30, 144, 255, 0.3);
-        }
-
-        .card h2 {
-            font-size: 1.2rem;
-            margin-bottom: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #FFD700;
-        }
-
-        .btn {
-            background: #1e293b;
-            border: none;
-            padding: 0.6rem 1rem;
-            border-radius: 40px;
-            color: white;
-            font-weight: bold;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: 0.2s;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .btn-primary {
-            background: #1E90FF;
-        }
-
-        .btn-warning {
-            background: #FFD700;
-            color: #0f172a;
-        }
-
-        .btn-danger {
-            background: #dc2626;
-        }
-
-        .btn-sm {
-            padding: 0.3rem 0.8rem;
-            font-size: 0.7rem;
-        }
-
-        input, textarea {
-            width: 100%;
-            background: #0f172a;
-            border: 1px solid #2d3a5e;
-            border-radius: 16px;
-            padding: 0.7rem;
-            color: white;
-            font-family: monospace;
-            font-size: 0.9rem;
-            margin-bottom: 0.8rem;
-        }
-
-        .history-list, .prompt-list, .learning-list {
-            list-style: none;
-            margin-top: 0.8rem;
-        }
-
-        .history-list li, .prompt-list li, .learning-list li {
-            background: #0f172a;
-            padding: 0.5rem;
-            border-radius: 12px;
-            margin-bottom: 0.5rem;
-            font-size: 0.8rem;
-            border-left: 3px solid #FFD700;
-            word-break: break-word;
-        }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(10, 15, 30, 0.95);
-            backdrop-filter: blur(12px);
-            display: flex;
-            justify-content: space-around;
-            padding: 0.6rem 0.5rem 0.8rem;
-            border-top: 1px solid #1E90FF;
-            z-index: 100;
-        }
-
-        .nav-item {
-            text-align: center;
-            background: none;
-            border: none;
-            color: #94a3b8;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: 0.2s;
-            flex: 1;
-        }
-
-        .nav-item.active {
-            color: #FFD700;
-        }
-
-        .nav-icon {
-            font-size: 1.5rem;
-            display: block;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1E90FF;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            z-index: 200;
-            animation: fadeOut 2s forwards;
-            pointer-events: none;
-        }
-
-        @keyframes fadeOut {
-            0% { opacity: 1; transform: translateX(-50%) translateY(0);}
-            70% { opacity: 1; }
-            100% { opacity: 0; transform: translateX(-50%) translateY(-10px); display: none; }
-        }
-
-        .xp-display {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-        }
-
-        .xp-badge {
-            background: #FFD700;
-            color: #0f172a;
-            padding: 0.2rem 0.8rem;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        hr {
-            border-color: #2d3a5e;
-            margin: 1rem 0;
-        }
-
-        @media (max-width: 500px) {
-            .card h2 { font-size: 1rem; }
-            .btn { font-size: 0.7rem; padding: 0.5rem 0.8rem; }
-        }
-    </style>
+    button:hover {
+      background: #1d4ed8;
+    }
+  </style>
 </head>
+
 <body>
-<div class="app-container">
-    <div class="header">
-        <h1>⚡ FICCION · CENTRAL IA v0.4 ⚡</h1>
-        <div class="header-buttons">
-            <button class="btn btn-sm" id="exportDataBtn">📤 Exportar datos</button>
-            <button class="btn btn-sm" id="importDataBtn">📥 Importar datos</button>
-            <input type="file" id="importFile" accept=".json" style="display: none;">
-        </div>
-    </div>
 
-    <!-- MÓDULO REDES SOCIALES (igual que antes, pero con mejor feedback) -->
-    <div id="socialModule" class="module active">
-        <div class="card">
-            <h2>📱 Plataformas</h2>
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <span class="btn" data-platform="YouTube">▶️ YouTube</span>
-                <span class="btn" data-platform="Instagram">📸 Instagram</span>
-                <span class="btn" data-platform="TikTok">🎵 TikTok</span>
-                <span class="btn" data-platform="Facebook">👥 Facebook</span>
-                <span class="btn" data-platform="X">🐦 X</span>
-            </div>
-            <div id="selectedPlatform" style="margin-top: 1rem;">Plataforma: <strong>Ninguna</strong></div>
-        </div>
-        <div class="card">
-            <h2>✍️ Acciones</h2>
-            <button class="btn btn-primary" id="createPostBtn">➕ Crear post</button>
-            <button class="btn btn-primary" id="generateCaptionBtn">✨ Generar caption</button>
-            <button class="btn" id="replyCommentBtn">💬 Responder comentarios</button>
-        </div>
-        <div class="card">
-            <h2>📜 Historial</h2>
-            <ul id="historyList" class="history-list"><li>Cargando...</li></ul>
-            <button class="btn btn-danger btn-sm" id="clearHistoryBtn">🗑️ Limpiar</button>
-        </div>
-    </div>
+  <header>
+    Ficcion OS 🚀
+  </header>
 
-    <!-- MÓDULO LAB IA + EJECUTAR PROMPT -->
-    <div id="codeModule" class="module">
-        <div class="card">
-            <h2>💻 Editor de código (HTML/CSS/JS)</h2>
-            <textarea id="codeEditor" rows="6" placeholder="Escribe HTML, CSS o JavaScript aquí..."></textarea>
-            <button class="btn btn-primary" id="runCodeBtn">▶️ Ejecutar JS</button>
-            <div id="codeOutput" style="background:#0f172a; padding:0.8rem; border-radius:16px; margin-top:0.5rem; font-family:monospace;">[Resultado]</div>
-        </div>
-        <div class="card">
-            <h2>🐍 Python (Pydroid)</h2>
-            <textarea id="pythonEditor" rows="4" placeholder="Código Python..."></textarea>
-            <button class="btn" id="copyPythonBtn">📋 Copiar para Pydroid</button>
-        </div>
-        <div class="card">
-            <h2>🤖 Prompts & Agentes</h2>
-            <input type="text" id="promptTitle" placeholder="Nombre del rol / prompt">
-            <textarea id="promptContent" rows="3" placeholder="Escribe el prompt..."></textarea>
-            <div>
-                <button class="btn btn-primary" id="savePromptBtn">💾 Guardar</button>
-                <button class="btn btn-warning" id="executePromptBtn">🚀 Ejecutar prompt</button>
-            </div>
-            <ul id="promptList" class="prompt-list"><li>Cargando...</li></ul>
-        </div>
-    </div>
+  <div class="container">
+    <h2>Agentes IA</h2>
 
-    <!-- MÓDULO INFRAESTRUCTURA (igual) -->
-    <div id="hardwareModule" class="module">
-        <div class="card">
-            <h2>🖥️ Hardware</h2>
-            <div><input type="checkbox" id="hwPc"> PC (escritorio/portátil)</div>
-            <div><input type="checkbox" id="hwGpu"> GPU (NVIDIA/AMD)</div>
-            <div><input type="checkbox" id="hwRam"> RAM ≥ 16GB</div>
-            <div><input type="checkbox" id="hwStorage"> Almacenamiento SSD</div>
-            <button class="btn" id="saveHardwareBtn">💾 Guardar</button>
-        </div>
-        <div class="card">
-            <h2>🔬 Investigación & Roadmap</h2>
-            <textarea id="researchNotes" rows="3" placeholder="Notas sobre servidores, IA local..."></textarea>
-            <textarea id="roadmapNotes" rows="3" placeholder="Roadmap de escalamiento..."></textarea>
-            <button class="btn" id="saveRoadmapBtn">💾 Guardar notas</button>
-        </div>
-    </div>
+    <button onclick="openAI('chatgpt')">Abrir ChatGPT</button>
+    <button onclick="openAI('claude')">Abrir Claude</button>
+    <button onclick="openAI('deepseek')">Abrir DeepSeek</button>
+  </div>
 
-    <!-- NUEVO MÓDULO TLAMATILIZTLI -->
-    <div id="tlamatiliztliModule" class="module">
-        <div class="card">
-            <h2>🌱 TLAMATILIZTLI · Escuela Inmersiva</h2>
-            <div class="xp-display">
-                <span>🎓 Nivel: <strong id="levelDisplay">1</strong></span>
-                <span>✨ XP: <strong id="xpDisplay">0</strong></span>
-                <span class="xp-badge" id="nextLevelInfo">Próximo: 100 XP</span>
-            </div>
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <button class="btn btn-primary" id="addXpBtn">➕ Sumar XP (+10)</button>
-                <button class="btn" id="customXpBtn">✏️ XP personalizado</button>
-                <button class="btn btn-danger" id="resetXpBtn">🔄 Reiniciar progreso</button>
-            </div>
-        </div>
-        <div class="card">
-            <h2>📖 Registro de aprendizaje</h2>
-            <textarea id="learningEntry" rows="2" placeholder="¿Qué aprendiste hoy?"></textarea>
-            <button class="btn btn-primary" id="addLearningBtn">📝 Registrar aprendizaje</button>
-            <ul id="learningList" class="learning-list"><li>Sin registros aún.</li></ul>
-        </div>
-    </div>
-</div>
+  <script>
+    function openAI(agent) {
+      let prompt = encodeURIComponent("Actúa como un sistema operativo de agentes IA. Ayúdame a construir mi ecosistema.");
 
-<!-- Navegación inferior (ahora 4 módulos) -->
-<div class="bottom-nav">
-    <button class="nav-item" data-module="social"><span class="nav-icon">📱</span><span>Redes</span></button>
-    <button class="nav-item" data-module="code"><span class="nav-icon">💻</span><span>Lab IA</span></button>
-    <button class="nav-item" data-module="hardware"><span class="nav-icon">⚙️</span><span>Infra</span></button>
-    <button class="nav-item" data-module="tlamatiliztli"><span class="nav-icon">🌱</span><span>Tlamatiliztli</span></button>
-</div>
+      let urls = {
+        chatgpt: `https://chat.openai.com/?q=${prompt}`,
+        claude: `https://claude.ai/new?q=${prompt}`,
+        deepseek: `https://chat.deepseek.com/?q=${prompt}`
+      };
 
-<script>
-    // ========== Helper: mostrar mensaje temporal ==========
-    function showMessage(text, isError = false) {
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.textContent = text;
-        if (isError) toast.style.background = '#dc2626';
-        else toast.style.background = '#1E90FF';
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2000);
+      window.open(urls[agent], '_blank');
     }
+  </script>
 
-    // ========== Gestión de módulos ==========
-    const modules = {
-        social: document.getElementById('socialModule'),
-        code: document.getElementById('codeModule'),
-        hardware: document.getElementById('hardwareModule'),
-        tlamatiliztli: document.getElementById('tlamatiliztliModule')
-    };
-    const navBtns = document.querySelectorAll('.nav-item');
-    function showModule(moduleId) {
-        Object.keys(modules).forEach(id => modules[id].classList.remove('active'));
-        modules[moduleId].classList.add('active');
-        navBtns.forEach(btn => {
-            if (btn.getAttribute('data-module') === moduleId) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-        localStorage.setItem('activeModule', moduleId);
-    }
-    const savedModule = localStorage.getItem('activeModule');
-    if (savedModule && modules[savedModule]) showModule(savedModule);
-    else showModule('social');
-    navBtns.forEach(btn => btn.addEventListener('click', () => showModule(btn.getAttribute('data-module'))));
-
-    // ========== SISTEMA DE EXPORTAR / IMPORTAR ==========
-    function getAllData() {
-        return {
-            socialHistory: JSON.parse(localStorage.getItem('socialHistory')) || [],
-            prompts: JSON.parse(localStorage.getItem('prompts')) || [],
-            hardware: {
-                hwPc: localStorage.getItem('hwPc') === 'true',
-                hwGpu: localStorage.getItem('hwGpu') === 'true',
-                hwRam: localStorage.getItem('hwRam') === 'true',
-                hwStorage: localStorage.getItem('hwStorage') === 'true'
-            },
-            researchNotes: localStorage.getItem('researchNotes') || '',
-            roadmapNotes: localStorage.getItem('roadmapNotes') || '',
-            tlamatiliztli: {
-                xp: parseInt(localStorage.getItem('tlamatiliztliXp') || '0'),
-                level: parseInt(localStorage.getItem('tlamatiliztliLevel') || '1'),
-                learnings: JSON.parse(localStorage.getItem('tlamatiliztliLearnings')) || []
-            }
-        };
-    }
-
-    function importData(jsonData) {
-        try {
-            const data = JSON.parse(jsonData);
-            if (data.socialHistory) localStorage.setItem('socialHistory', JSON.stringify(data.socialHistory));
-            if (data.prompts) localStorage.setItem('prompts', JSON.stringify(data.prompts));
-            if (data.hardware) {
-                localStorage.setItem('hwPc', data.hardware.hwPc);
-                localStorage.setItem('hwGpu', data.hardware.hwGpu);
-                localStorage.setItem('hwRam', data.hardware.hwRam);
-                localStorage.setItem('hwStorage', data.hardware.hwStorage);
-            }
-            if (data.researchNotes !== undefined) localStorage.setItem('researchNotes', data.researchNotes);
-            if (data.roadmapNotes !== undefined) localStorage.setItem('roadmapNotes', data.roadmapNotes);
-            if (data.tlamatiliztli) {
-                localStorage.setItem('tlamatiliztliXp', data.tlamatiliztli.xp);
-                localStorage.setItem('tlamatiliztliLevel', data.tlamatiliztli.level);
-                localStorage.setItem('tlamatiliztliLearnings', JSON.stringify(data.tlamatiliztli.learnings));
-            }
-            // Recargar todas las interfaces
-            location.reload(); // simple recarga para refrescar todo
-        } catch(e) { showMessage('Error al importar: archivo inválido', true); }
-    }
-
-    document.getElementById('exportDataBtn').addEventListener('click', () => {
-        const data = getAllData();
-        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `ficcion_backup_${new Date().toISOString().slice(0,19)}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        showMessage('📦 Datos exportados');
-    });
-    const importFileInput = document.getElementById('importFile');
-    document.getElementById('importDataBtn').addEventListener('click', () => importFileInput.click());
-    importFileInput.addEventListener('change', (e) => {
-        if (e.target.files.length) {
-            const reader = new FileReader();
-            reader.onload = (ev) => importData(ev.target.result);
-            reader.readAsText(e.target.files[0]);
-        }
-        e.target.value = '';
-    });
-
-    // ========== MÓDULO REDES SOCIALES ==========
-    let currentPlatform = 'Ninguna';
-    document.querySelectorAll('[data-platform]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            currentPlatform = btn.getAttribute('data-platform');
-            document.querySelector('#selectedPlatform strong').textContent = currentPlatform;
-        });
-    });
-    let contentHistory = JSON.parse(localStorage.getItem('socialHistory')) || [];
-    function renderHistory() {
-        const list = document.getElementById('historyList');
-        if (!list) return;
-        list.innerHTML = contentHistory.length ? '' : '<li>No hay contenido guardado aún.</li>';
-        contentHistory.forEach(item => {
-            const li = document.createElement('li');
-            li.textContent = `${item.platform} · ${item.type} · ${item.content.substring(0, 60)}${item.content.length>60?'…':''}`;
-            list.appendChild(li);
-        });
-    }
-    function addToHistory(platform, type, content) {
-        contentHistory.unshift({ platform, type, content, date: new Date().toISOString() });
-        if (contentHistory.length > 20) contentHistory.pop();
-        localStorage.setItem('socialHistory', JSON.stringify(contentHistory));
-        renderHistory();
-    }
-    document.getElementById('createPostBtn')?.addEventListener('click', () => {
-        if (currentPlatform === 'Ninguna') return showMessage('Selecciona una plataforma primero', true);
-        const content = prompt(`Escribe el texto para el post en ${currentPlatform}:`);
-        if (content) { addToHistory(currentPlatform, 'Post', content); showMessage(`✅ Post creado en ${currentPlatform}`); }
-    });
-    document.getElementById('generateCaptionBtn')?.addEventListener('click', () => {
-        if (currentPlatform === 'Ninguna') return showMessage('Selecciona una plataforma', true);
-        const caption = `🔥 ¡Mira esto, FICCION! Contenido increíble para ${currentPlatform}. #IA #AztekIA 🚀`;
-        addToHistory(currentPlatform, 'Caption generado', caption);
-        showMessage('✨ Caption generado y guardado');
-    });
-    document.getElementById('replyCommentBtn')?.addEventListener('click', () => {
-        if (currentPlatform === 'Ninguna') return showMessage('Selecciona una plataforma', true);
-        const reply = `💬 ¡Gracias por tu comentario! Sígueme para más contenido de ciencia y tecnología. 🔥`;
-        addToHistory(currentPlatform, 'Respuesta a comentario', reply);
-        showMessage('💬 Respuesta sugerida guardada');
-    });
-    document.getElementById('clearHistoryBtn')?.addEventListener('click', () => {
-        contentHistory = [];
-        localStorage.setItem('socialHistory', JSON.stringify(contentHistory));
-        renderHistory();
-        showMessage('Historial limpiado');
-    });
-    renderHistory();
-
-    // ========== LAB IA ==========
-    document.getElementById('runCodeBtn')?.addEventListener('click', () => {
-        const code = document.getElementById('codeEditor').value;
-        const outDiv = document.getElementById('codeOutput');
-        try {
-            let output = '';
-            const oldLog = console.log;
-            console.log = (msg) => output += String(msg) + '\n';
-            eval(code);
-            console.log = oldLog;
-            outDiv.innerHTML = `<pre style="margin:0;">✅ Ejecutado.\n${output || 'Sin salida.'}</pre>`;
-        } catch(e) { outDiv.innerHTML = `<pre style="color:#ff8888;">❌ Error: ${e.message}</pre>`; }
-    });
-    document.getElementById('copyPythonBtn')?.addEventListener('click', () => {
-        const code = document.getElementById('pythonEditor').value;
-        navigator.clipboard.writeText(code).then(() => showMessage('Código copiado, pégalo en Pydroid'));
-    });
-    // Prompts
-    let prompts = JSON.parse(localStorage.getItem('prompts')) || [];
-    function renderPrompts() {
-        const list = document.getElementById('promptList');
-        if (!list) return;
-        list.innerHTML = prompts.length ? '' : '<li>No hay prompts guardados.</li>';
-        prompts.forEach((p, idx) => {
-            const li = document.createElement('li');
-            li.innerHTML = `<strong>${p.title}</strong><br>${p.content.substring(0, 80)}${p.content.length>80?'…':''}`;
-            list.appendChild(li);
-        });
-    }
-    document.getElementById('savePromptBtn')?.addEventListener('click', () => {
-        const title = document.getElementById('promptTitle').value.trim();
-        const content = document.getElementById('promptContent').value.trim();
-        if (!title || !content) return showMessage('Escribe título y contenido', true);
-        prompts.push({ title, content });
-        localStorage.setItem('prompts', JSON.stringify(prompts));
-        renderPrompts();
-        document.getElementById('promptTitle').value = '';
-        document.getElementById('promptContent').value = '';
-        showMessage('Prompt guardado');
-    });
-    // EJECUTAR PROMPT: copia y abre ChatGPT
-    document.getElementById('executePromptBtn')?.addEventListener('click', () => {
-        const lastPrompt = prompts.length ? prompts[prompts.length-1].content : document.getElementById('promptContent').value.trim();
-        if (!lastPrompt) return showMessage('No hay prompt para ejecutar', true);
-        navigator.clipboard.writeText(lastPrompt).then(() => {
-            showMessage('Prompt copiado al portapapeles. Abriendo ChatGPT...');
-            window.open('https://chat.openai.com', '_blank');
-        }).catch(() => showMessage('No se pudo copiar', true));
-    });
-    renderPrompts();
-
-    // ========== INFRAESTRUCTURA ==========
-    ['hwPc','hwGpu','hwRam','hwStorage'].forEach(id => {
-        const chk = document.getElementById(id);
-        if (chk) chk.checked = localStorage.getItem(id) === 'true';
-        chk?.addEventListener('change', () => localStorage.setItem(id, chk.checked));
-    });
-    const research = document.getElementById('researchNotes');
-    const roadmap = document.getElementById('roadmapNotes');
-    if (research) research.value = localStorage.getItem('researchNotes') || '';
-    if (roadmap) roadmap.value = localStorage.getItem('roadmapNotes') || '';
-    document.getElementById('saveHardwareBtn')?.addEventListener('click', () => {
-        localStorage.setItem('researchNotes', research?.value || '');
-        localStorage.setItem('roadmapNotes', roadmap?.value || '');
-        showMessage('Notas guardadas');
-    });
-
-    // ========== TLAMATILIZTLI ==========
-    let tlamatiliztliXp = parseInt(localStorage.getItem('tlamatiliztliXp') || '0');
-    let tlamatiliztliLevel = parseInt(localStorage.getItem('tlamatiliztliLevel') || '1');
-    let learnings = JSON.parse(localStorage.getItem('tlamatiliztliLearnings')) || [];
-
-    function updateXpDisplay() {
-        const xpSpan = document.getElementById('xpDisplay');
-        const levelSpan = document.getElementById('levelDisplay');
-        const nextInfo = document.getElementById('nextLevelInfo');
-        if (xpSpan) xpSpan.textContent = tlamatiliztliXp;
-        if (levelSpan) levelSpan.textContent = tlamatiliztliLevel;
-        const xpNeeded = tlamatiliztliLevel * 100;
-        if (nextInfo) nextInfo.textContent = `Próximo nivel: ${xpNeeded} XP`;
-    }
-    function checkLevelUp() {
-        let xpNeeded = tlamatiliztliLevel * 100;
-        while (tlamatiliztliXp >= xpNeeded) {
-            tlamatiliztliXp -= xpNeeded;
-            tlamatiliztliLevel++;
-            xpNeeded = tlamatiliztliLevel * 100;
-            showMessage(`🎉 ¡Subiste al nivel ${tlamatiliztliLevel}!`);
-        }
-        localStorage.setItem('tlamatiliztliXp', tlamatiliztliXp);
-        localStorage.setItem('tlamatiliztliLevel', tlamatiliztliLevel);
-        updateXpDisplay();
-    }
-    function addXp(amount) {
-        tlamatiliztliXp += amount;
-        localStorage.setItem('tlamatiliztliXp', tlamatiliztliXp);
-        checkLevelUp();
-        updateXpDisplay();
-        showMessage(`+${amount} XP ganados`);
-    }
-    document.getElementById('addXpBtn')?.addEventListener('click', () => addXp(10));
-    document.getElementById('customXpBtn')?.addEventListener('click', () => {
-        let val = prompt('Cantidad de XP a añadir:', '10');
-        if (val && !isNaN(parseInt(val))) addXp(parseInt(val));
-        else showMessage('Cantidad inválida', true);
-    });
-    document.getElementById('resetXpBtn')?.addEventListener('click', () => {
-        if (confirm('¿Reiniciar progreso de Tlamatiliztli? Se perderán XP, nivel y registros.')) {
-            tlamatiliztliXp = 0;
-            tlamatiliztliLevel = 1;
-            learnings = [];
-            localStorage.setItem('tlamatiliztliXp', 0);
-            localStorage.setItem('tlamatiliztliLevel', 1);
-            localStorage.setItem('tlamatiliztliLearnings', JSON.stringify([]));
-            updateXpDisplay();
-            renderLearnings();
-            showMessage('Progreso reiniciado');
-        }
-    });
-    function renderLearnings() {
-        const list = document.getElementById('learningList');
-        if (!list) return;
-        list.innerHTML = learnings.length ? '' : '<li>Sin registros aún.</li>';
-        learnings.slice().reverse().forEach(entry => {
-            const li = document.createElement('li');
-            li.textContent = `${entry.date} · ${entry.text}`;
-            list.appendChild(li);
-        });
-    }
-    document.getElementById('addLearningBtn')?.addEventListener('click', () => {
-        const text = document.getElementById('learningEntry').value.trim();
-        if (!text) return showMessage('Escribe qué aprendiste', true);
-        learnings.push({ date: new Date().toLocaleString(), text });
-        localStorage.setItem('tlamatiliztliLearnings', JSON.stringify(learnings));
-        renderLearnings();
-        document.getElementById('learningEntry').value = '';
-        showMessage('Aprendizaje registrado');
-    });
-    updateXpDisplay();
-    renderLearnings();
-</script>
 </body>
 </html>
