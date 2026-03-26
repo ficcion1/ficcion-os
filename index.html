@@ -27,6 +27,15 @@
       padding: 20px;
     }
 
+    select, textarea {
+      width: 90%;
+      margin: 10px auto;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 14px;
+    }
+
     button {
       margin: 5px;
       padding: 10px;
@@ -36,16 +45,6 @@
       background: #2563eb;
       color: white;
       cursor: pointer;
-    }
-
-    textarea {
-      width: 90%;
-      height: 100px;
-      margin: 10px auto;
-      border-radius: 10px;
-      padding: 10px;
-      border: none;
-      font-size: 14px;
     }
 
     .saved {
@@ -60,13 +59,8 @@
       margin-top: 5px;
     }
 
-    .delete {
-      background: #dc2626;
-    }
-
-    .edit {
-      background: #f59e0b;
-    }
+    .delete { background: #dc2626; }
+    .edit { background: #f59e0b; }
   </style>
 </head>
 
@@ -81,9 +75,17 @@
   <button onclick="openAI('claude')">Claude</button>
   <button onclick="openAI('deepseek')">DeepSeek</button>
 
-  <h2>Guardar idea / prompt</h2>
-  <textarea id="idea" placeholder="Escribe aquí tu idea..."></textarea>
-  <br>
+  <h2>Guardar idea</h2>
+
+  <select id="category">
+    <option value="ideas">Ideas</option>
+    <option value="ia">IA</option>
+    <option value="codigo">Código</option>
+    <option value="negocio">Negocio</option>
+    <option value="tlamatiliztli">Tlamatiliztli</option>
+  </select>
+
+  <textarea id="idea" placeholder="Escribe aquí..."></textarea>
   <button onclick="saveIdea()">Guardar</button>
 
   <h2>Memoria</h2>
@@ -114,11 +116,13 @@ function setMemory(memory) {
 }
 
 function saveIdea() {
-  let idea = document.getElementById("idea").value;
-  if (!idea) return;
+  let text = document.getElementById("idea").value;
+  let category = document.getElementById("category").value;
+
+  if (!text) return;
 
   let memory = getMemory();
-  memory.push(idea);
+  memory.push({ text, category });
   setMemory(memory);
 
   document.getElementById("idea").value = "";
@@ -134,9 +138,9 @@ function deleteIdea(index) {
 
 function editIdea(index) {
   let memory = getMemory();
-  let nueva = prompt("Editar idea:", memory[index]);
+  let nueva = prompt("Editar:", memory[index].text);
   if (nueva !== null) {
-    memory[index] = nueva;
+    memory[index].text = nueva;
     setMemory(memory);
     loadMemory();
   }
@@ -147,35 +151,46 @@ function loadMemory() {
   let container = document.getElementById("memory");
   container.innerHTML = "";
 
-  memory.slice().reverse().forEach((item, i) => {
-    let index = memory.length - 1 - i;
+  let categories = {};
 
-    let div = document.createElement("div");
-    div.className = "saved";
+  memory.forEach((item, index) => {
+    if (!categories[item.category]) categories[item.category] = [];
+    categories[item.category].push({ ...item, index });
+  });
 
-    let text = document.createElement("div");
-    text.innerText = item;
+  Object.keys(categories).forEach(cat => {
+    let title = document.createElement("h3");
+    title.innerText = cat.toUpperCase();
+    container.appendChild(title);
 
-    let actions = document.createElement("div");
-    actions.className = "actions";
+    categories[cat].slice().reverse().forEach(item => {
+      let div = document.createElement("div");
+      div.className = "saved";
 
-    let editBtn = document.createElement("button");
-    editBtn.innerText = "Editar";
-    editBtn.className = "edit";
-    editBtn.onclick = () => editIdea(index);
+      let text = document.createElement("div");
+      text.innerText = item.text;
 
-    let delBtn = document.createElement("button");
-    delBtn.innerText = "Borrar";
-    delBtn.className = "delete";
-    delBtn.onclick = () => deleteIdea(index);
+      let actions = document.createElement("div");
+      actions.className = "actions";
 
-    actions.appendChild(editBtn);
-    actions.appendChild(delBtn);
+      let editBtn = document.createElement("button");
+      editBtn.innerText = "Editar";
+      editBtn.className = "edit";
+      editBtn.onclick = () => editIdea(item.index);
 
-    div.appendChild(text);
-    div.appendChild(actions);
+      let delBtn = document.createElement("button");
+      delBtn.innerText = "Borrar";
+      delBtn.className = "delete";
+      delBtn.onclick = () => deleteIdea(item.index);
 
-    container.appendChild(div);
+      actions.appendChild(editBtn);
+      actions.appendChild(delBtn);
+
+      div.appendChild(text);
+      div.appendChild(actions);
+
+      container.appendChild(div);
+    });
   });
 }
 
